@@ -1,0 +1,44 @@
+package pl.com.bottega.ecommerce.sales.domain.invoicing;
+
+import org.junit.Before;
+import org.junit.Test;
+import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
+import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
+import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductData;
+import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
+import pl.com.bottega.ecommerce.sharedkernel.Money;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Date;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class BookKeeperTest {
+
+    private BookKeeper bookKeeper;
+    private InvoiceRequest invoiceRequest;
+    private TaxPolicy taxPolicy;
+
+    @Before
+    public void setUp() throws Exception {
+        bookKeeper = new BookKeeper(new InvoiceFactory());
+        invoiceRequest = new InvoiceRequest(mock(ClientData.class));
+        taxPolicy = mock(TaxPolicy.class);
+    }
+
+    @Test
+    public void shouldReturnOneInvoiceIfOneProductIsGiven() {
+        RequestItem requestItem = new RequestItem(mock(ProductData.class), 1, new Money(1));
+        invoiceRequest.add(requestItem);
+
+        when(taxPolicy.calculateTax(any(), any())).thenReturn(new Tax(new Money(new BigDecimal(1)), "tax"));
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        assertThat(invoice.getItems().size(), is(1));
+    }
+}
