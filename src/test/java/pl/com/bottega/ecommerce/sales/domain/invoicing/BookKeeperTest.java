@@ -41,4 +41,17 @@ public class BookKeeperTest {
 
         assertThat(invoice.getItems().size(), is(1));
     }
+
+    @Test
+    public void shouldReturnTwoInvoicesIfTwoProductsAreGiven() {
+        RequestItem requestItem1 = new RequestItem(mock(ProductData.class), 1, new Money(1));
+        RequestItem requestItem2 = new RequestItem(mock(ProductData.class), 1, new Money(1));
+        invoiceRequest.add(requestItem1);
+        invoiceRequest.add(requestItem2);
+
+        when(taxPolicy.calculateTax(any(), any())).thenReturn(new Tax(new Money(new BigDecimal(1)), "tax"));
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        assertThat(invoice.getItems().size(), is(2));
+    }
 }
