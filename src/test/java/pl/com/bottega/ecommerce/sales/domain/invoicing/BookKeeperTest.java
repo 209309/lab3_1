@@ -15,8 +15,7 @@ import java.util.Date;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BookKeeperTest {
 
@@ -60,5 +59,11 @@ public class BookKeeperTest {
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
         assertThat(invoice.getItems().size(), is(0));
+    }
+
+    @Test
+    public void shouldNotUseCalculateTaxMethodIfThereAreNoProducts() {
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        verify(taxPolicy, times(0)).calculateTax(any(), any());
     }
 }
