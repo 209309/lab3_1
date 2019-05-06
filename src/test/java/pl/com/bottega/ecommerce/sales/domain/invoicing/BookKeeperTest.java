@@ -54,4 +54,11 @@ public class BookKeeperTest {
 
         assertThat(invoice.getItems().size(), is(2));
     }
+
+    @Test
+    public void shouldReturnZeroIfNoProductsAreGiven() {
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        assertThat(invoice.getItems().size(), is(0));
+    }
 }
