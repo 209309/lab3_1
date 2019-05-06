@@ -57,7 +57,6 @@ public class BookKeeperTest {
     @Test
     public void shouldReturnZeroIfNoProductsAreGiven() {
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
-
         assertThat(invoice.getItems().size(), is(0));
     }
 
@@ -78,5 +77,18 @@ public class BookKeeperTest {
         bookKeeper.issuance(invoiceRequest, taxPolicy);
 
         verify(taxPolicy, times(2)).calculateTax(any(), any());
+    }
+
+    @Test
+    public void shouldReturnSumOfProductsPrice() {
+        RequestItem requestItem1 = new RequestItem(mock(ProductData.class), 1, new Money(10));
+        RequestItem requestItem2 = new RequestItem(mock(ProductData.class), 1, new Money(10));
+        invoiceRequest.add(requestItem1);
+        invoiceRequest.add(requestItem2);
+
+        when(taxPolicy.calculateTax(any(), any())).thenReturn(new Tax(new Money(new BigDecimal(1)), "tax"));
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        assertThat(invoice.getGros().toString(), is("22.00 €"));
     }
 }
