@@ -85,4 +85,11 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
         assertThat(reservation.contains(product), is(true));
     }
+
+    @Test
+    public void shouldReturnFalseIfProductIsNotAvailable() {
+        product.markAsRemoved();
+        addProductCommandHandler.handle(addProductCommand);
+        assertThat(reservation.contains(product), is(false));
+    }
 }
