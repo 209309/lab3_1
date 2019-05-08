@@ -21,6 +21,7 @@ import pl.com.bottega.ecommerce.system.application.SystemContext;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -77,5 +78,11 @@ public class AddProductCommandHandlerTest {
 
         verify(suggestionService, times(1)).suggestEquivalent(any(), any());
         verify(clientRepository, times(1)).load(any());
+    }
+
+    @Test
+    public void shouldReturnTrueIfProductIsAvailable() {
+        addProductCommandHandler.handle(addProductCommand);
+        assertThat(reservation.contains(product), is(true));
     }
 }
