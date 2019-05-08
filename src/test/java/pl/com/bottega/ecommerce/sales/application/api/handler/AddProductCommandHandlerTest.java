@@ -39,7 +39,7 @@ public class AddProductCommandHandlerTest {
     private AddProductCommandHandler addProductCommandHandler;
     private AddProductCommand addProductCommand;
     private Product product;
-    private Product product2;
+    private Product productRemoved;
     private Reservation reservation;
     private SystemContext systemContext;
 
@@ -50,6 +50,7 @@ public class AddProductCommandHandlerTest {
         systemContext = new SystemContext();
         addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
         product = new Product(Id.generate(), new Money(new BigDecimal(10)), "name", ProductType.FOOD);
+        productRemoved = new Product(Id.generate(), new Money(new BigDecimal(10)), "name", ProductType.FOOD);
         client = new Client();
         reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(), new Date());
 
@@ -58,7 +59,7 @@ public class AddProductCommandHandlerTest {
         when(reservationRepository.load(any())).thenReturn(reservation);
         when(productRepository.load(any())).thenReturn(product);
         when(clientRepository.load(any())).thenReturn(client);
-        when(suggestionService.suggestEquivalent(product, client)).thenReturn(product);
+        when(suggestionService.suggestEquivalent(any(), any())).thenReturn(productRemoved);
         doNothing().when(reservationRepository).save(any());
     }
 
@@ -67,5 +68,14 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
         verify(suggestionService, never()).suggestEquivalent(any(), any());
         verify(clientRepository, never()).load(any());
+    }
+
+    @Test
+    public void shouldEnterIfWhenProductIsMarkedAsRemoved() {
+        product.markAsRemoved();
+        addProductCommandHandler.handle(addProductCommand);
+
+        verify(suggestionService, times(1)).suggestEquivalent(any(), any());
+        verify(clientRepository, times(1)).load(any());
     }
 }
